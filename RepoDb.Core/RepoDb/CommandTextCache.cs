@@ -641,6 +641,62 @@ namespace RepoDb
 
         #endregion
 
+        #region GetQueryTableFuncText
+
+        /// <summary>
+        /// Gets a command text from the cache for the query table function operation.
+        /// </summary>
+        /// <param name="request">The request object.</param>
+        /// <returns>The cached command text.</returns>
+        internal static string GetQueryTableFuncText(QueryTableFuncRequest request)
+        {
+            var commandText = (string)null;
+            if (m_cache.TryGetValue(request, out commandText) == false)
+            {
+                var statementBuilder = EnsureStatementBuilder(request.Connection, request.StatementBuilder);
+                var fields = GetActualFields(request.Connection, request.Name, request.Fields, request.Transaction);
+                commandText = statementBuilder.CreateTableFuncQuery(new QueryBuilder(),
+                    request.Name,
+                    request.Parameters,
+                    fields,
+                    request.Where,
+                    request.OrderBy,
+                    request.Top,
+                    request.Hints);
+                m_cache.TryAdd(request, commandText);
+            }
+            return commandText;
+        } 
+
+        #endregion
+
+        #region GetQueryTableFuncText
+
+        /// <summary>
+        /// Gets a command text from the cache for the query table function operation.
+        /// </summary>
+        /// <param name="request">The request object.</param>
+        /// <returns>The cached command text.</returns>
+        internal static string GetQueryAllTableFuncText(QueryAllTableFuncRequest request)
+        {
+            var commandText = (string)null;
+            if (m_cache.TryGetValue(request, out commandText) == false)
+            {
+                var statementBuilder = EnsureStatementBuilder(request.Connection, request.StatementBuilder);
+                var fields = GetActualFields(request.Connection, request.Name, request.Fields, request.Transaction);
+                commandText = statementBuilder.CreateTableFuncQueryAll(new QueryBuilder(),
+                    request.Name,
+                    request.Parameters,
+                    fields,
+                    request.OrderBy,
+                    request.Hints);
+                m_cache.TryAdd(request, commandText);
+            }
+            return commandText;
+        } 
+
+        #endregion
+
         #region Helper Methods
 
         /// <summary>
@@ -757,5 +813,6 @@ namespace RepoDb
         }
 
         #endregion
+
     }
 }

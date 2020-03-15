@@ -3,6 +3,7 @@ using RepoDb.Enumerations;
 using RepoDb.Exceptions;
 using RepoDb.Extensions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -242,6 +243,14 @@ namespace RepoDb
 
             // Return the value
             return new QueryField(field, operation, value);
+        }
+
+        public static IEnumerable<QueryField> Parse(object obj)
+        {
+            foreach (var property in obj.GetType().GetProperties())
+            {
+                yield return property.AsQueryField(obj);
+            }
         }
 
         // GetOperation

@@ -1202,6 +1202,52 @@ namespace RepoDb.StatementBuilders
 
         #endregion
 
+        #region CreateTableFuncQuery
+
+        /// <summary>
+        /// Creates a SQL Statement for query from table function operation.
+        /// </summary>
+        /// <param name="queryBuilder">The query builder to be used.</param>
+        /// <param name="funcName">The name of the target function.</param>
+        /// <param name="parameters">The list of function parameters.</param>
+        /// <param name="fields">The list of fields.</param>
+        /// <param name="where">The query expression.</param>
+        /// <param name="orderBy">The list of fields for ordering.</param>
+        /// <param name="top">The number of rows to be returned.</param>
+        /// <param name="hints">The table hints to be used.</param>
+        /// <returns>A sql statement for query operation.</returns>
+        public abstract string CreateTableFuncQuery(QueryBuilder queryBuilder,
+            string funcName,
+            IEnumerable<Field> parameters,
+            IEnumerable<Field> fields,
+            QueryGroup where = null,
+            IEnumerable<OrderField> orderBy = null,
+            int? top = null,
+            string hints = null); 
+
+        #endregion
+
+        #region CreateTableFuncQueryAll
+
+        /// <summary>
+        /// Creates a SQL Statement for query all from table function operation.
+        /// </summary>
+        /// <param name="queryBuilder">The query builder to be used.</param>
+        /// <param name="funcName">The name of the target function.</param>
+        /// <param name="parameters">The list of function parameters.</param>
+        /// <param name="fields">The list of fields.</param>
+        /// <param name="orderBy">The list of fields for ordering.</param>
+        /// <param name="hints">The table hints to be used.</param>
+        /// <returns>A sql statement for query operation.</returns>
+        public abstract string CreateTableFuncQueryAll(QueryBuilder queryBuilder,
+            string funcName,
+            IEnumerable<Field> parameters,
+            IEnumerable<Field> fields,
+            IEnumerable<OrderField> orderBy = null,
+            string hints = null); 
+
+        #endregion
+
         #endregion
 
         #region Helper

@@ -23,6 +23,13 @@ namespace RepoDb.Extensions
             yield return queryField;
         }
 
+        public static IEnumerable<Field> GetFields(this IEnumerable<QueryField> queryFields)
+        {
+            if (!queryFields.Any())
+                return new Field[0];
+            return queryFields.Select(q => q.Field);
+        }
+
         /// <summary>
         /// Resets all the instances of <see cref="QueryField"/>.
         /// </summary>
@@ -133,11 +140,15 @@ namespace RepoDb.Extensions
         }
 
         // AsObject
-        internal static object AsObject(this IEnumerable<QueryField> queryFields)
+        internal static object AsObject(this IEnumerable<QueryField> queryFields, object appendTo = null)
         {
-            var expandoObject = new ExpandoObject() as IDictionary<string, object>;
+            var expandoObject = (appendTo ?? new ExpandoObject()) as IDictionary<string, object>;
             foreach (var queryField in queryFields)
             {
+                if (queryField.Operation != Operation.Equal)
+                {
+                    throw new InvalidOperationException($"Operation must only be '{nameof(Operation.Equal)}'.");
+                }
                 expandoObject.Add(queryField.Field.Name, queryField.Parameter.Value);
             }
             return expandoObject;

@@ -660,5 +660,155 @@ namespace RepoDb.StatementBuilders
         }
 
         #endregion
+
+        #region CreateTableFuncQuery
+
+        /// <summary>
+        /// Creates a SQL Statement for query to table function operation.
+        /// </summary>
+        /// <param name="queryBuilder">The query builder to be used.</param>
+        /// <param name="funcName">The name of the target function.</param>
+        /// <param name="parameters">The list of function parameters.</param>
+        /// <param name="fields">The list of fields.</param>
+        /// <param name="where">The query expression.</param>
+        /// <param name="orderBy">The list of fields for ordering.</param>
+        /// <param name="top">The number of rows to be returned.</param>
+        /// <param name="hints">The table hints to be used.</param>
+        /// <returns>A sql statement for query operation.</returns>
+        public override string CreateTableFuncQuery(QueryBuilder queryBuilder,
+            string funcName,
+            IEnumerable<Field> parameters,
+            IEnumerable<Field> fields,
+            QueryGroup where = null,
+            IEnumerable<OrderField> orderBy = null,
+            int? top = null,
+            string hints = null)
+        {
+            if (string.IsNullOrEmpty(funcName?.Trim()))
+            {
+                throw new NullReferenceException("The name of the function could be null.");
+            }
+
+            // Validate the hints
+            GuardHints(hints);
+
+            // There should be fields
+            if (fields?.Any() != true)
+            {
+                throw new NullReferenceException($"The list of queryable fields must not be null for '{funcName}'.");
+            }
+
+            // Validate the ordering
+            if (orderBy != null)
+            {
+                // Check if the order fields are present in the given fields
+                var unmatchesOrderFields = orderBy?.Where(orderField =>
+                    fields?.FirstOrDefault(f =>
+                        string.Equals(orderField.Name, f.Name, StringComparison.OrdinalIgnoreCase)) == null);
+
+                // Throw an error we found any unmatches
+                if (unmatchesOrderFields?.Any() == true)
+                {
+                    throw new MissingFieldsException($"The order fields '{unmatchesOrderFields.Select(field => field.Name).Join(", ")}' are not " +
+                                                     $"present at the given fields '{fields.Select(field => field.Name).Join(", ")}'.");
+                }
+            }
+
+            // Initialize the builder
+            var builder = queryBuilder ?? new QueryBuilder();
+
+            // Build the query
+            builder.Clear()
+                .Select()
+                .TopFrom(top)
+                .FieldsFrom(fields, DbSetting)
+                .From()
+                .TableNameFrom(funcName, DbSetting)
+                .OpenParen()
+                .ParametersFrom(parameters, 0, DbSetting)
+                .CloseParen()
+                .HintsFrom(hints)
+                .WhereFrom(where, DbSetting)
+                .OrderByFrom(orderBy, DbSetting)
+                .End();
+
+            // Return the query
+            return builder.GetString();
+        } 
+
+        #endregion
+
+        #region CreateTableFuncQueryAll
+
+        /// <summary>
+        /// Creates a SQL Statement for query to table function operation.
+        /// </summary>
+        /// <param name="queryBuilder">The query builder to be used.</param>
+        /// <param name="funcName">The name of the target function.</param>
+        /// <param name="parameters">The list of function parameters.</param>
+        /// <param name="fields">The list of fields.</param>
+        /// <param name="where">The query expression.</param>
+        /// <param name="orderBy">The list of fields for ordering.</param>
+        /// <param name="top">The number of rows to be returned.</param>
+        /// <param name="hints">The table hints to be used.</param>
+        /// <returns>A sql statement for query operation.</returns>
+        public override string CreateTableFuncQueryAll(QueryBuilder queryBuilder,
+            string funcName,
+            IEnumerable<Field> parameters,
+            IEnumerable<Field> fields,
+            IEnumerable<OrderField> orderBy = null,
+            string hints = null)
+        {
+            if (string.IsNullOrEmpty(funcName?.Trim()))
+            {
+                throw new NullReferenceException("The name of the function could be null.");
+            }
+
+            // Validate the hints
+            GuardHints(hints);
+
+            // There should be fields
+            if (fields?.Any() != true)
+            {
+                throw new NullReferenceException($"The list of queryable fields must not be null for '{funcName}'.");
+            }
+
+            // Validate the ordering
+            if (orderBy != null)
+            {
+                // Check if the order fields are present in the given fields
+                var unmatchesOrderFields = orderBy?.Where(orderField =>
+                    fields?.FirstOrDefault(f =>
+                        string.Equals(orderField.Name, f.Name, StringComparison.OrdinalIgnoreCase)) == null);
+
+                // Throw an error we found any unmatches
+                if (unmatchesOrderFields?.Any() == true)
+                {
+                    throw new MissingFieldsException($"The order fields '{unmatchesOrderFields.Select(field => field.Name).Join(", ")}' are not " +
+                                                     $"present at the given fields '{fields.Select(field => field.Name).Join(", ")}'.");
+                }
+            }
+
+            // Initialize the builder
+            var builder = queryBuilder ?? new QueryBuilder();
+
+            // Build the query
+            builder.Clear()
+                .Select()
+                .FieldsFrom(fields, DbSetting)
+                .From()
+                .TableNameFrom(funcName, DbSetting)
+                .OpenParen()
+                .ParametersFrom(parameters, 0, DbSetting)
+                .CloseParen()
+                .HintsFrom(hints)
+                .OrderByFrom(orderBy, DbSetting)
+                .End();
+
+            // Return the query
+            return builder.GetString();
+        } 
+
+        #endregion
     }
 }

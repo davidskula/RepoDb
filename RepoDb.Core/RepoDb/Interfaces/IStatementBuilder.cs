@@ -453,5 +453,21 @@ namespace RepoDb.Interfaces
             string hints = null);
 
         #endregion
+
+        string CreateTableFuncQuery(QueryBuilder queryBuilder,
+            string funcName,
+            IEnumerable<Field> parameters,
+            IEnumerable<Field> fields,
+            QueryGroup where = null,
+            IEnumerable<OrderField> orderBy = null,
+            int? top = null,
+            string hints = null);
+
+        string CreateTableFuncQueryAll(QueryBuilder queryBuilder,
+            string funcName,
+            IEnumerable<Field> parameters,
+            IEnumerable<Field> fields,
+            IEnumerable<OrderField> orderBy = null,
+            string hints = null); 
     }
 }
